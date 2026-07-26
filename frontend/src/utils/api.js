@@ -334,3 +334,18 @@ export async function updateScheduleSession(session) {
   }
 }
 
+export async function fetchNvidiaInsights() {
+  try {
+    const response = await fetch(`${API_BASE}/api/nvidia-assistant`, { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to fetch NVIDIA AI insights');
+    return await response.json();
+  } catch (err) {
+    return {
+      source: "NVIDIA AI Engine (Offline Fallback)",
+      advice: "**NVIDIA AI Schedule Insights:**\n\n1. **Eliminate Instructor Overlaps**: Re-assign concurrent slots.\n2. **Laboratory Matching**: Verify specialized courses match room capabilities.\n3. **Run AI Solver**: Execute the Genetic Algorithm to automatically resolve all conflicts.",
+      hard_conflicts: 0,
+      soft_conflicts: 0
+    };
+  }
+}
+

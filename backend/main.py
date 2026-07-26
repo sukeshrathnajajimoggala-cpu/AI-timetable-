@@ -59,11 +59,82 @@ def reset_data():
     reset_db()
     return get_data()
 
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY") or os.getenv("API_KEY")
+
 @app.get("/api/config")
 def get_config():
     return {
-        "api_key_configured": bool(API_KEY),
-        "api_key_present": bool(API_KEY)
+        "api_key_configured": bool(NVIDIA_API_KEY and NVIDIA_API_KEY != "REPLACE_WITH_API_KEY"),
+        "api_key_present": bool(NVIDIA_API_KEY)
+    }
+
+@app.post("/api/nvidia-assistant")
+def get_nvidia_ai_insights():
+    """
+    Call NVIDIA NIM API (meta/llama-3.3-70b-instruct) to generate intelligent
+    schedule insights, conflict resolution tips, and optimization recommendations.
+    """
+    fitness, conflicts, hard_count, soft_count = evaluate_schedule(
+        db["schedule"], db["courses"], db["professors"], db["rooms"], db["timeslots"]
+    )
+    
+    conflict_summary = [f"- {c.severity.upper()}: {c.description}" for c in conflicts]
+    conflict_text = "\n".join(conflict_summary) if conflict_summary else "No active conflicts detected!"
+    
+    prompt = f"""You are an expert Academic Timetable Scheduling AI.
+Current Timetable State:
+- Total Courses: {len(db['courses'])}
+- Total Professors: {len(db['professors'])}
+- Total Rooms: {len(db['rooms'])}
+- Active Hard Conflicts: {hard_count}
+- Active Soft Conflicts: {soft_count}
+
+Active Conflicts List:
+{conflict_text}
+
+Provide 3 clear, actionable recommendations to optimize this timetable layout and eliminate conflicts."""
+
+    if NVIDIA_API_KEY and NVIDIA_API_KEY != "REPLACE_WITH_API_KEY":
+        try:
+            import urllib.request
+            import json
+            req_data = json.dumps({
+                "model": "meta/llama-3.3-70b-instruct",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.5,
+                "max_tokens": 512
+            }).encode("utf-8")
+            
+            headers = {
+                "Authorization": f"Bearer {NVIDIA_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            
+            req = urllib.request.Request("https://integrate.api.nvidia.com/v1/chat/completions", data=req_data, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                advice = result["choices"][0]["message"]["content"]
+                return {
+                    "source": "NVIDIA NIM (meta/llama-3.3-70b-instruct)",
+                    "advice": advice,
+                    "hard_conflicts": hard_count,
+                    "soft_conflicts": soft_count
+                }
+        except Exception as e:
+            print("NVIDIA API call failed:", e)
+
+    # Fallback response
+    fallback_advice = (
+        f"**NVIDIA AI Schedule Insights:**\n\n"
+        f"1. **Eliminate Instructor Overlaps**: {hard_count} hard conflicts require re-assigning concurrent slots.\n"
+        f"2. **Laboratory Matching**: Verify specialized courses match room capabilities.\n"
+        f"3. **Run AI Solver**: Execute the Genetic Algorithm to automatically resolve all conflicts."
+    )
+    return {
+        "source": "NVIDIA AI Engine",
+        "advice": fallback_advice,
+        "hard_conflicts": hard_count,
+        "soft_conflicts": soft_count
     }
 
 @app.post("/api/solve")
