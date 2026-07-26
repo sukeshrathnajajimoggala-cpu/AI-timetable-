@@ -1,0 +1,1 @@
+# AI-timetable-conflits-resolver
