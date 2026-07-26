@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyr
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+.eggs/
+venv/
+.venv/
+backend/.venv/
+.env
+.env.*
+
+# Node
+node_modules/
+frontend/node_modules/
+.npm/
+.npmrc
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Vite
+frontend/.vite/
+dist/
+
+# macOS
+.DS_Store
