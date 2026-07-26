@@ -70,6 +70,23 @@ The frontend runs on `http://localhost:5173` by default.
 - `DELETE /api/courses/{course_id}` - delete a course
 - `POST /api/schedule/update` - update a schedule session manually
 
+## Deployment on Render
+
+The backend can be deployed to Render using the included `render.yaml` service definition.
+
+1. Create a Render account and connect your GitHub repository.
+2. Add a new web service and choose the `main` branch.
+3. Render should automatically detect `render.yaml` and configure the service.
+4. If you configure manually, use these settings:
+
+- Environment: `Python`
+- Root directory: `backend`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Auto deploy: enabled
+
+The API will be available at the Render service URL once the deployment completes.
+
 ## Notes
 
 - CORS is enabled on the backend to allow frontend integration.
