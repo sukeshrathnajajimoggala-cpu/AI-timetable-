@@ -5,8 +5,8 @@ services:
     plan: free
     branch: main
     rootDir: backend
-    buildCommand: python -m pip install -r requirements.txt
-    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: NVIDIA_API_KEY
         value: "REPLACE_WITH_NVIDIA_API_KEY"
