@@ -2,9 +2,10 @@ services:
   - type: web_service
     name: AI Timetable Backend
     env: python
+    runtime: python3.14
     plan: free
     branch: main
     root: backend
-    buildCommand: python3 -m pip install -r requirements.txt
-    startCommand: python3 -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     autoDeploy: true
