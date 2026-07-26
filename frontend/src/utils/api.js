@@ -164,9 +164,11 @@ export function evaluateMockSchedule(schedule, courses, professors, rooms, times
   return conflicts;
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export async function fetchTimetableData() {
   try {
-    const response = await fetch('/api/data');
+    const response = await fetch(`${API_BASE}/api/data`);
     if (!response.ok) {
       const err = await response.json();
       throw new Error(err.detail || 'Failed to fetch timetable data');
@@ -181,7 +183,7 @@ export async function fetchTimetableData() {
 
 export async function runAISolver(params) {
   try {
-    const response = await fetch('/api/solve', {
+    const response = await fetch(`${API_BASE}/api/solve`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -238,7 +240,7 @@ export async function runAISolver(params) {
 
 export async function resetTimetableData() {
   try {
-    const response = await fetch('/api/reset', { method: 'POST' });
+    const response = await fetch(`${API_BASE}/api/reset`, { method: 'POST' });
     if (!response.ok) throw new Error('Reset failed');
     return await response.json();
   } catch (err) {
@@ -248,7 +250,7 @@ export async function resetTimetableData() {
 
 export async function addProfessor(professor) {
   try {
-    const response = await fetch('/api/professors', {
+    const response = await fetch(`${API_BASE}/api/professors`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(professor),
@@ -262,7 +264,7 @@ export async function addProfessor(professor) {
 
 export async function deleteProfessor(profId) {
   try {
-    const response = await fetch(`/api/professors/${profId}`, { method: 'DELETE' });
+    const response = await fetch(`${API_BASE}/api/professors/${profId}`, { method: 'DELETE' });
     if (!response.ok) throw new Error('Failed to delete professor');
     return await response.json();
   } catch (err) {
@@ -272,7 +274,7 @@ export async function deleteProfessor(profId) {
 
 export async function addRoom(room) {
   try {
-    const response = await fetch('/api/rooms', {
+    const response = await fetch(`${API_BASE}/api/rooms`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(room),
@@ -286,7 +288,7 @@ export async function addRoom(room) {
 
 export async function deleteRoom(roomId) {
   try {
-    const response = await fetch(`/api/rooms/${roomId}`, { method: 'DELETE' });
+    const response = await fetch(`${API_BASE}/api/rooms/${roomId}`, { method: 'DELETE' });
     if (!response.ok) throw new Error('Failed to delete room');
     return await response.json();
   } catch (err) {
@@ -296,7 +298,7 @@ export async function deleteRoom(roomId) {
 
 export async function addCourse(course) {
   try {
-    const response = await fetch('/api/courses', {
+    const response = await fetch(`${API_BASE}/api/courses`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(course),
@@ -310,7 +312,7 @@ export async function addCourse(course) {
 
 export async function deleteCourse(courseId) {
   try {
-    const response = await fetch(`/api/courses/${courseId}`, { method: 'DELETE' });
+    const response = await fetch(`${API_BASE}/api/courses/${courseId}`, { method: 'DELETE' });
     if (!response.ok) throw new Error('Failed to delete course');
     return await response.json();
   } catch (err) {
@@ -320,7 +322,7 @@ export async function deleteCourse(courseId) {
 
 export async function updateScheduleSession(session) {
   try {
-    const response = await fetch('/api/schedule/update', {
+    const response = await fetch(`${API_BASE}/api/schedule/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(session),
