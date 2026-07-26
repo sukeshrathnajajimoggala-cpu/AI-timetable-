@@ -2,10 +2,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 import copy
+import os
 
 from models import Professor, Room, Course, Timeslot, ScheduleSession, Conflict, SolveRequest, TimetableData
 import sample_data
 from genetic_solver import evaluate_schedule, GeneticSolver
+
+API_KEY = os.getenv("API_KEY")
 
 app = FastAPI(title="AI Timetable Conflict Resolver API")
 
@@ -55,6 +58,13 @@ def get_data():
 def reset_data():
     reset_db()
     return get_data()
+
+@app.get("/api/config")
+def get_config():
+    return {
+        "api_key_configured": bool(API_KEY),
+        "api_key_present": bool(API_KEY)
+    }
 
 @app.post("/api/solve")
 def solve_timetable(req: SolveRequest):

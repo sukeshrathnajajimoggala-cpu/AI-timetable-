@@ -79,11 +79,25 @@ The backend can be deployed to Render using the included `render.yaml` service d
 3. Render should automatically detect `render.yaml` and configure the service.
 4. If you configure manually, use these settings:
 
-- Environment: `Python`
+- Runtime: `python`
 - Root directory: `backend`
 - Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Start command: `python -m uvicorn main:app --host 0.0.0.0 --port $PORT`
 - Auto deploy: enabled
+
+### API Key configuration
+
+The backend now reads `API_KEY` from the environment.
+
+- Locally, create `backend/.env` with:
+
+```bash
+API_KEY=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
+```
+
+- On Render, set the `API_KEY` environment variable for the backend service.
+
+The backend exposes `GET /api/config` to verify whether the key is configured.
 
 The API will be available at the Render service URL once the deployment completes.
 
