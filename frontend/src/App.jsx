@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Calendar, Library, ShieldAlert, Cpu } from 'lucide-react';
-import { fetchTimetableData } from './utils/api';
+import { LayoutDashboard, Calendar, Library, ShieldAlert, Cpu, WifiOff } from 'lucide-react';
+import { fetchTimetableData, getMockData } from './utils/api';
 import ThemeToggle from './components/ThemeToggle';
 import Dashboard from './components/Dashboard';
 import TimetableGrid from './components/TimetableGrid';
@@ -12,13 +12,20 @@ export default function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (forceDemo = false) => {
     try {
       setLoading(true);
       setError('');
-      const timetableData = await fetchTimetableData();
-      setData(timetableData);
+      if (forceDemo) {
+        setData(getMockData());
+        setIsDemoMode(true);
+      } else {
+        const timetableData = await fetchTimetableData();
+        setData(timetableData);
+        setIsDemoMode(false);
+      }
     } catch (err) {
       setError(err.message || 'Failed to load timetable data from API');
     } finally {
@@ -78,12 +85,17 @@ export default function App() {
       }}>
         <ShieldAlert size={48} style={{ color: 'var(--destructive)' }} />
         <h2 style={{ fontWeight: 800 }}>Database Connection Failed</h2>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: '400px', fontSize: '0.9rem' }}>
-          Unable to establish a connection with the FastAPI backend server. Make sure your Python backend is running on port 8000.
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '440px', fontSize: '0.9rem' }}>
+          Unable to establish a connection with the FastAPI backend server. You can retry connecting or continue in Standalone Demo Mode.
         </p>
-        <button className="btn btn-accent" onClick={loadData}>
-          Retry Connection
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="btn btn-accent" onClick={() => loadData(false)}>
+            Retry Connection
+          </button>
+          <button className="btn" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }} onClick={() => loadData(true)}>
+            Launch Demo Mode
+          </button>
+        </div>
       </div>
     );
   }
@@ -164,10 +176,17 @@ export default function App() {
         <div className="sidebar-footer">
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>API Status</span>
-            <span style={{ fontSize: '0.7rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'semibold' }}>
-              <span style={{ width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%' }} />
-              Connected (FastAPI)
-            </span>
+            {isDemoMode ? (
+              <span style={{ fontSize: '0.7rem', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}>
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#f59e0b', borderRadius: '50%' }} />
+                Demo Mode (Standalone)
+              </span>
+            ) : (
+              <span style={{ fontSize: '0.7rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}>
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%' }} />
+                Connected (FastAPI)
+              </span>
+            )}
           </div>
         </div>
       </aside>
